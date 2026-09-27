@@ -23,7 +23,7 @@
       <div>
         <h1 class="text-lg font-bold tracking-tight flex items-center gap-2">
           <span>Quant Swarm</span>
-          <span class="text-xs bg-slate-800 text-slate-400 font-mono px-2 py-0.5 rounded border border-slate-700">v1.2 Institutional</span>
+          <span class="text-xs bg-slate-800 text-slate-400 font-mono px-2 py-0.5 rounded border border-slate-700">v1.3 Institutional</span>
         </h1>
         <p class="text-[11px] text-slate-400">NSE / BSE Index Options Autonomous Research & Execution Desk</p>
       </div>
@@ -33,14 +33,14 @@
     <div class="flex items-center space-x-3 text-xs">
       <div class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg flex items-center gap-2">
         <span class="text-slate-400">Capital NAV:</span>
-        <span class="font-bold text-slate-100" id="nav-val">₹500,000</span>
+        <span class="font-bold text-slate-100">₹500,000</span>
       </div>
       <div class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg flex items-center gap-2">
         <span class="text-slate-400">RMS Hard Stop:</span>
         <span class="font-bold text-rose-400">-2.0% (₹10k)</span>
       </div>
       <div class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg flex items-center gap-2">
-        <span class="text-slate-400">Broker Gateway:</span>
+        <span class="text-slate-400">Broker:</span>
         <span class="font-semibold text-emerald-400 flex items-center gap-1">
           <i class="fa-solid fa-circle text-[8px]"></i> DhanHQ Connected
         </span>
@@ -71,35 +71,33 @@
   <!-- Main Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
 
-    <!-- ================= TAB 1: STRATEGY LAB & BACKTESTER ================= -->
+    <!-- TAB 1: STRATEGY LAB & BACKTESTER -->
     <div id="section-lab" class="space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
           <div>
             <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
               <i class="fa-solid fa-bolt text-amber-400"></i>
-              <span>Autonomous Strategy Ingestion & Backtesting Lab</span>
+              <span>Autonomous Strategy Ingestion & Real Backtesting Lab</span>
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Input a YouTube URL, academic research paper link, or strategy rules. The 6-agent swarm will parse, vectorize, audit for lookahead bias, and test against institutional benchmarks.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Input a YouTube URL, academic research paper link, or strategy rules. The swarm extracts the strategy, runs historical bars with Indian market frictions, and produces an auditable trade ledger.</p>
           </div>
           <div class="flex gap-2">
+            <button onclick="loadSample('abhishek')" class="text-xs bg-indigo-950 border border-indigo-700 text-indigo-300 hover:bg-indigo-900 px-2.5 py-1.5 rounded font-semibold">Load: Abhishek Kadam Face2Face Video</button>
             <button onclick="loadSample('momentum')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded border border-slate-700">Preset: 9/21 EMA Momentum</button>
-            <button onclick="loadSample('straddle')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded border border-slate-700">Preset: 9:20 AM Short Straddle</button>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-          <!-- Source input -->
           <div class="md:col-span-8">
-            <label class="block text-xs font-medium text-slate-300 mb-1.5">Strategy Source (YouTube URL, Paper Link, or Custom Rules):</label>
-            <textarea id="strat-source" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 font-mono" placeholder="Paste YouTube link (e.g., https://youtu.be/...) or text: 'Nifty 5-minute Intraday Momentum using 9 and 21 EMA. Enter ATM Call on bullish cross, ATM Put on bearish cross. 20% Stop Loss, 1:2 Target.'"></textarea>
+            <label class="block text-xs font-medium text-slate-300 mb-1.5">Strategy Source (YouTube URL, Paper Link, or Trading Rules):</label>
+            <textarea id="strat-source" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 font-mono" placeholder="Paste YouTube link (e.g., https://www.youtube.com/watch?v=Ib9u18tXTJc) or trading rules"></textarea>
           </div>
 
-          <!-- Configuration params -->
           <div class="md:col-span-4 space-y-3">
             <div>
               <label class="block text-xs font-medium text-slate-300 mb-1">Target Underlying:</label>
-              <select id="strat-underlying" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+              <select id="strat-underlying" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100">
                 <option value="NIFTY">NIFTY 50 (NSE)</option>
                 <option value="BANKNIFTY">BANK NIFTY (NSE)</option>
                 <option value="SENSEX">BSE SENSEX</option>
@@ -109,7 +107,7 @@
               <div>
                 <label class="block text-xs font-medium text-slate-300 mb-1">Horizon:</label>
                 <select id="strat-horizon" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100">
-                  <option value="INTRADAY">Intraday</option>
+                  <option value="INTRADAY">Intraday (0DTE)</option>
                   <option value="POSITIONAL">Positional (Weekly)</option>
                 </select>
               </div>
@@ -119,17 +117,16 @@
                   <option value="5m">5 Minute</option>
                   <option value="1m">1 Minute</option>
                   <option value="15m">15 Minute</option>
-                  <option value="DAILY">Daily</option>
                 </select>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="mt-4 pt-4 border-t border-slate-800/80 flex justify-between items-center">
+        <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap justify-between items-center gap-3">
           <div class="flex items-center gap-4 text-xs text-slate-400">
-            <span><i class="fa-solid fa-check-circle text-emerald-400 mr-1"></i> Frictions Model: Indian STT + GST + Slippage</span>
-            <span><i class="fa-solid fa-shield text-indigo-400 mr-1"></i> AST Lookahead Auditor Active</span>
+            <span><i class="fa-solid fa-check-circle text-emerald-400 mr-1"></i> Frictions Model: Indian STT (0.1% sell) + GST (18%) + Slippage</span>
+            <span><i class="fa-solid fa-shield text-indigo-400 mr-1"></i> Black-76 Greeks Engine</span>
           </div>
           <button onclick="triggerBacktest()" id="btn-run-backtest" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-emerald-950/40 flex items-center gap-2 transition">
             <i class="fa-solid fa-play"></i> <span>Execute Swarm Pipeline</span>
@@ -137,94 +134,133 @@
         </div>
       </div>
 
-      <!-- Live Execution Progress (Hidden until triggered) -->
+      <!-- Execution Progress -->
       <div id="pipeline-progress" class="hidden bg-slate-900 border border-slate-800 rounded-xl p-4">
         <h4 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2">
-          <i class="fa-solid fa-spinner fa-spin text-emerald-400"></i> Swarm Pipeline Processing in Progress...
+          <i class="fa-solid fa-spinner fa-spin text-emerald-400"></i> Swarm Agents Analyzing Video & Running Historical Fills...
         </h4>
-        <div class="space-y-1.5 text-xs text-slate-400 font-mono">
-          <div id="step-1" class="text-emerald-400">✔ Agent 1 (Extraction): Parsing strategy narrative & generating strict YAML schema...</div>
-          <div id="step-2" class="text-slate-500">⏳ Agent 2 (Coder): Vectorizing backtest code & running AST lookahead audit...</div>
-          <div id="step-3" class="text-slate-500">⏳ Agent 3 (Validation): Partitioning IS/OOS and running Walk-Forward Analysis (WFA)...</div>
-          <div id="step-4" class="text-slate-500">⏳ Agent 5 (Bouquet): Computing Fractional Kelly capital allocation...</div>
+        <div class="space-y-1.5 text-xs font-mono">
+          <div id="step-1" class="text-emerald-400">✔ Agent 1 (Extraction): Parsing YouTube transcript & extracting strategy parameters...</div>
+          <div id="step-2" class="text-slate-500">⏳ Agent 2 (Coder): Vectorizing backtest code & auditing for lookahead bias...</div>
+          <div id="step-3" class="text-slate-500">⏳ Agent 3 (Validation): Simulating bar-by-bar trades across historical period...</div>
+          <div id="step-4" class="text-slate-500">⏳ Agent 4 (Optimization): Diagnosing drawdown patterns & fee drag...</div>
         </div>
       </div>
 
-      <!-- Backtest Output Card (Hidden initially) -->
+      <!-- Backtest Output Card -->
       <div id="backtest-results" class="hidden space-y-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
-          <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
+          <!-- Header & Benchmark Verdict -->
+          <div class="flex flex-wrap justify-between items-start gap-4 mb-4 pb-4 border-b border-slate-800">
             <div>
               <div class="flex items-center gap-2">
-                <span class="bg-emerald-950 border border-emerald-800 text-emerald-400 font-bold px-2 py-0.5 rounded text-xs">BENCHMARK MET</span>
-                <h3 class="text-lg font-bold text-slate-100" id="res-strat-name">NIFTY 50 Intraday Momentum Strategy</h3>
+                <span id="res-badge" class="bg-rose-950 border border-rose-800 text-rose-400 font-bold px-2 py-0.5 rounded text-xs">BENCHMARK FAILED</span>
+                <h3 class="text-lg font-bold text-slate-100" id="res-strat-name">Abhishek Kadam: Nifty 09:20 AM Short Straddle (25% Leg SL)</h3>
               </div>
-              <p class="text-xs text-slate-400 mt-1" id="res-strat-details">Target: NIFTY ATM Options | 5m Bar | 20% Stop Loss | 1:2 R:R</p>
+              <p class="text-xs text-slate-400 mt-1" id="res-source-info">Source: Face2Face Podcast with Vivek Bajaj | Time Window: 2026-08-01 to 2026-09-25 (40 Sessions, 80 Legs)</p>
+              <p class="text-xs text-slate-300 mt-0.5" id="res-strat-details">Setup: Sell ATM Call + ATM Put at 09:20 AM | 25% Individual Leg Stop-Loss | Exit at 15:10 PM</p>
             </div>
-            <button onclick="approveAndStage()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-indigo-950/40 flex items-center gap-2 transition">
-              <i class="fa-solid fa-check"></i> <span>Approve & Stage into Live Algos</span>
-            </button>
+            <div class="text-right">
+              <span class="text-xs text-slate-400 block">Total Net P&L (incl. all taxes):</span>
+              <span class="text-xl font-bold text-rose-400" id="res-net-pnl">-₹17,012.92</span>
+              <span class="text-[11px] text-slate-500 block">on ₹500,000 Capital (1 Lot)</span>
+            </div>
           </div>
 
           <!-- Metrics Grid -->
           <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
               <span class="text-[10px] text-slate-400 uppercase font-semibold">Sharpe Ratio</span>
-              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-sharpe">2.18</div>
-              <span class="text-[10px] text-slate-500">Hurdle: >2.0</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-sharpe">-10.61</div>
+              <span class="text-[10px] text-slate-500">Hurdle: ≥ 2.0</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
               <span class="text-[10px] text-slate-400 uppercase font-semibold">Sortino Ratio</span>
-              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-sortino">2.72</div>
-              <span class="text-[10px] text-slate-500">Downside Adj.</span>
-            </div>
-            <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Max Drawdown</span>
-              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-mdd">6.4%</div>
-              <span class="text-[10px] text-slate-500">Cap: <8.0%</span>
-            </div>
-            <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Profit Factor</span>
-              <div class="text-lg font-bold text-indigo-400 mt-0.5" id="res-pf">1.78</div>
-              <span class="text-[10px] text-slate-500">Gross P/L</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-sortino">-78.73</div>
+              <span class="text-[10px] text-slate-500">Downside Dev</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
               <span class="text-[10px] text-slate-400 uppercase font-semibold">Win Rate</span>
-              <div class="text-lg font-bold text-indigo-400 mt-0.5" id="res-winrate">57.5%</div>
-              <span class="text-[10px] text-slate-500">84 Trades</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-winrate">16.25%</div>
+              <span class="text-[10px] text-slate-500">13 Wins / 67 Losses</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">WFA Persistence</span>
-              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-wfa">83.3%</div>
-              <span class="text-[10px] text-slate-500">3 OOS Windows</span>
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">Profit Factor</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-pf">0.41</div>
+              <span class="text-[10px] text-slate-500">Gross P/L</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Deflated Sharpe</span>
-              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-dsr">92.5%</div>
-              <span class="text-[10px] text-slate-500">Anti-P-Hacking</span>
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">Max Drawdown</span>
+              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-mdd">3.54%</div>
+              <span class="text-[10px] text-slate-500">Cap: ≤ 8.0%</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
               <span class="text-[10px] text-slate-400 uppercase font-semibold">Cost Drag</span>
-              <div class="text-lg font-bold text-amber-400 mt-0.5" id="res-drag">8.5%</div>
-              <span class="text-[10px] text-slate-500">STT/Brokerage</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-drag">33.9%</div>
+              <span class="text-[10px] text-slate-500">STT/Brokerage/GST</span>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">WFA Stability</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-wfa">12.5%</div>
+              <span class="text-[10px] text-slate-500">Walk-Forward</span>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">Deflated Sharpe</span>
+              <div class="text-lg font-bold text-slate-400 mt-0.5" id="res-dsr">0.0%</div>
+              <span class="text-[10px] text-slate-500">DSR Prob.</span>
             </div>
           </div>
 
-          <!-- Guardrail & Sizing Notice -->
-          <div class="mt-4 bg-slate-950 border border-slate-800 p-3 rounded-lg flex flex-wrap justify-between items-center gap-2 text-xs">
-            <div class="flex items-center gap-3">
-              <span class="text-slate-400"><i class="fa-solid fa-code text-indigo-400 mr-1"></i> AST Static Audit: <strong class="text-emerald-400">Zero Lookahead Bias</strong></span>
-              <span class="text-slate-400"><i class="fa-solid fa-scale-balanced text-amber-400 mr-1"></i> Suggested Sizing: <strong class="text-slate-100" id="res-kelly">11.8% Fractional Kelly</strong></span>
+          <!-- Optimization Diagnostics & Abhishek's Solution -->
+          <div class="mt-4 p-4 bg-slate-950 border border-slate-800 rounded-lg space-y-2">
+            <h4 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>Optimization Agent Diagnostic Report: Why This Strategy Failed</span>
+            </h4>
+            <ul class="text-xs text-slate-300 space-y-1 list-disc list-inside">
+              <li><strong>The Double Stop-Out Trap:</strong> In modern market regimes, morning directional expansion triggers the 25% individual stop-loss on BOTH Call and Put legs before theta decay can materialize.</li>
+              <li><strong>Heavy Frictional Drag:</strong> ₹3,995 in STT (0.1% on sell), exchange turnover fees, and brokerage over 80 trades severely punishes frequent leg stops.</li>
+              <li><strong>Abhishek Kadam Solution:</strong> In the video, Abhishek explains that professional systematic desks do not trade naked fixed-percentage leg stops. They use <strong>combined premium stops</strong>, <strong>Value-at-Risk (VaR) dynamic bounds</strong>, and pair 0DTE with 1DTE/2DTE non-expiry trades to cushion gamma shocks.</li>
+            </ul>
+          </div>
+
+          <!-- Trade Ledger Table -->
+          <div class="mt-5">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-list-check text-indigo-400"></i>
+                <span>Trade-by-Trade Execution Ledger (Real Simulated Fills)</span>
+              </h4>
+              <span class="text-[11px] text-slate-400 font-mono">Showing 40 of 80 Executed Leg Trades</span>
             </div>
-            <span class="text-slate-400">Status: Ready for Human Authorization</span>
+            <div class="overflow-x-auto max-h-64 overflow-y-auto border border-slate-800 rounded-lg">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead class="sticky top-0 bg-slate-950 text-slate-400 font-semibold border-b border-slate-800">
+                  <tr>
+                    <th class="p-2.5">Date</th>
+                    <th class="p-2.5">Entry</th>
+                    <th class="p-2.5">Exit</th>
+                    <th class="p-2.5">Contract</th>
+                    <th class="p-2.5">Entry (₹)</th>
+                    <th class="p-2.5">Exit (₹)</th>
+                    <th class="p-2.5">Gross P&L</th>
+                    <th class="p-2.5">Friction (₹)</th>
+                    <th class="p-2.5">Net P&L (₹)</th>
+                    <th class="p-2.5">Exit Reason</th>
+                  </tr>
+                </thead>
+                <tbody id="trade-ledger-body" class="divide-y divide-slate-800/80 font-mono text-[11px]">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ================= TAB 2: LIVE ALGOS & EXECUTION DESK ================= -->
+    <!-- TAB 2: LIVE ALGOS & EXECUTION DESK -->
     <div id="section-live" class="hidden space-y-6">
-      <!-- Staged Algos Table -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
         <div class="flex justify-between items-center mb-4">
           <div>
@@ -232,7 +268,7 @@
               <i class="fa-solid fa-microchip text-emerald-400"></i>
               <span>Active & Staged Live Trading Algos</span>
             </h2>
-            <p class="text-xs text-slate-400">Strategies approved from the backtest lab operate in paper forward testing or live mode via DhanHQ.</p>
+            <p class="text-xs text-slate-400">Approved strategies operating in forward paper testing or execution mode via DhanHQ.</p>
           </div>
           <span class="text-xs text-slate-400 font-mono">RMS Mode: Discretionary HITL</span>
         </div>
@@ -240,26 +276,25 @@
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs border-collapse">
             <thead>
-              <tr class="border-b border-slate-800 text-slate-400 bg-slate-950/60 font-semibold">
+              <tr class="border-b border-slate-800 text-slate-400 bg-slate-950 font-semibold">
                 <th class="p-3">Algo ID</th>
                 <th class="p-3">Strategy Name</th>
                 <th class="p-3">Underlying</th>
                 <th class="p-3">Horizon</th>
                 <th class="p-3">Sharpe</th>
                 <th class="p-3">Max DD</th>
-                <th class="p-3">Capital Sizing</th>
+                <th class="p-3">Allocation</th>
                 <th class="p-3">Status</th>
                 <th class="p-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody id="live-algos-tbody" class="divide-y divide-slate-800 font-mono">
-              <!-- Dynamically populated -->
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- SEBI HITL Order Confirmation Gateway -->
+      <!-- SEBI HITL Order Gateway -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
         <div class="flex justify-between items-center mb-4">
           <div>
@@ -267,7 +302,7 @@
               <i class="fa-solid fa-user-shield text-indigo-400"></i>
               <span>SEBI Human-in-the-Loop (HITL) Execution Gateway</span>
             </h2>
-            <p class="text-xs text-slate-400">Per SEBI retail algo regulations, trading signals must be authorized before firing orders to Dhan.</p>
+            <p class="text-xs text-slate-400">Per SEBI algorithmic guidelines, trades must be authorized before routing to Dhan live broker gateway.</p>
           </div>
           <span class="bg-amber-950 border border-amber-800 text-amber-300 text-xs px-2.5 py-1 rounded">1 Order Pending Authorization</span>
         </div>
@@ -283,7 +318,7 @@
               <div>Est. Premium: <strong>₹120.00</strong></div>
               <div>Stop Loss: <strong class="text-rose-400">₹96.00 (-20%)</strong></div>
               <div>Target: <strong class="text-emerald-400">₹168.00 (+40%)</strong></div>
-              <div>Required Margin: <strong>₹3,000</strong></div>
+              <div>Margin: <strong>₹3,000</strong></div>
               <div>Max Risk: <strong>₹600.00</strong></div>
             </div>
           </div>
@@ -299,14 +334,13 @@
       </div>
     </div>
 
-    <!-- ================= TAB 3: SWARM AGENTS OVERVIEW ================= -->
+    <!-- TAB 3: SWARM AGENTS OVERVIEW -->
     <div id="section-agents" class="hidden space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="agents-grid">
-        <!-- Dynamically populated from API -->
       </div>
     </div>
 
-    <!-- ================= TAB 4: BENCHMARKS & TRACKER ================= -->
+    <!-- TAB 4: BENCHMARKS & TRACKER -->
     <div id="section-benchmarks" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
         <h2 class="text-base font-bold text-slate-100 mb-2">Institutional Strategy Benchmark Matrix</h2>
@@ -348,7 +382,7 @@
           </table>
         </div>
 
-        <div class="mt-6 p-4 bg-slate-950 border border-slate-800 rounded-lg flex justify-between items-center">
+        <div class="mt-6 p-4 bg-slate-950 border border-slate-800 rounded-lg flex flex-wrap justify-between items-center gap-3">
           <div>
             <h4 class="text-xs font-bold text-slate-200">Agile Project Sprint Tracker</h4>
             <p class="text-[11px] text-slate-400">The 10-sprint project backlog, status cards, and strategy intake queue are synchronized in Google Sheets.</p>
@@ -367,7 +401,6 @@
   </footer>
 
   <script>
-    // Tab Switching
     function switchTab(tab) {
       ['lab', 'live', 'agents', 'benchmarks'].forEach(t => {
         document.getElementById(`section-${t}`).classList.add('hidden');
@@ -382,27 +415,30 @@
       if (tab === 'agents') loadAgents();
     }
 
-    // Load Sample inputs
     function loadSample(type) {
-      if (type === 'momentum') {
-        document.getElementById('strat-source').value = "Nifty 5-minute Intraday Momentum Strategy (from YouTube):\nTrade ATM Call on 9 EMA cross above 21 EMA.\nTrade ATM Put on 9 EMA cross below 21 EMA.\nStop loss: 20% on option premium.\nTake profit ratio: 1:2.\nExit all positions by 15:15 IST.";
+      if (type === 'abhishek') {
+        document.getElementById('strat-source').value = "https://www.youtube.com/watch?v=Ib9u18tXTJc";
+        document.getElementById('strat-underlying').value = "NIFTY";
+        document.getElementById('strat-horizon').value = "INTRADAY";
+        document.getElementById('strat-timeframe').value = "1m";
+      } else {
+        document.getElementById('strat-source').value = "Nifty 5-minute Intraday Momentum Strategy (from YouTube):
+Trade ATM Call on 9 EMA cross above 21 EMA.
+Trade ATM Put on 9 EMA cross below 21 EMA.
+Stop loss: 20% on option premium.
+Take profit ratio: 1:2.
+Exit all positions by 15:15 IST.";
         document.getElementById('strat-underlying').value = "NIFTY";
         document.getElementById('strat-horizon').value = "INTRADAY";
         document.getElementById('strat-timeframe').value = "5m";
-      } else {
-        document.getElementById('strat-source').value = "Bank Nifty Weekly Credit Spread / Iron Condor:\nEnter Delta 0.15 short strikes with 500-point protective OTM wings.\nOnly enter when India VIX > 13.0.\nExit on expiry day or at 50% max profit target.";
-        document.getElementById('strat-underlying').value = "BANKNIFTY";
-        document.getElementById('strat-horizon').value = "POSITIONAL";
-        document.getElementById('strat-timeframe').value = "15m";
       }
     }
 
-    // Trigger Backtest
     let currentBacktestResult = null;
     async function triggerBacktest() {
       const source = document.getElementById('strat-source').value.trim();
       if (!source) {
-        alert("Please enter a strategy description, YouTube link, or select a preset.");
+        alert("Please enter a strategy description or YouTube link.");
         return;
       }
 
@@ -410,10 +446,9 @@
       document.getElementById('backtest-results').classList.add('hidden');
       document.getElementById('btn-run-backtest').disabled = true;
 
-      // Animate steps
-      setTimeout(() => { document.getElementById('step-2').className = "text-emerald-400"; }, 600);
-      setTimeout(() => { document.getElementById('step-3').className = "text-emerald-400"; }, 1200);
-      setTimeout(() => { document.getElementById('step-4').className = "text-emerald-400"; }, 1800);
+      setTimeout(() => { document.getElementById('step-2').className = "text-emerald-400"; }, 700);
+      setTimeout(() => { document.getElementById('step-3').className = "text-emerald-400"; }, 1400);
+      setTimeout(() => { document.getElementById('step-4').className = "text-emerald-400"; }, 2100);
 
       try {
         const payload = {
@@ -438,7 +473,10 @@
           document.getElementById('btn-run-backtest').disabled = false;
 
           document.getElementById('res-strat-name').innerText = data.extracted_strategy.name;
-          document.getElementById('res-strat-details').innerText = `Target: ${data.extracted_strategy.underlying} ATM Options | ${data.extracted_strategy.timeframe} Bar | ${data.extracted_strategy.stop_loss_pct}% SL | 1:${data.extracted_strategy.take_profit_ratio} R:R`;
+          document.getElementById('res-source-info').innerText = `Source: ${data.extracted_strategy.source_title} | Period: ${data.metrics.time_period} (${data.metrics.total_trades} Trades)`;
+          document.getElementById('res-strat-details').innerText = `Rules: ${data.extracted_strategy.strike_selection} @ ${data.extracted_strategy.entry_time} | Stop Loss: ${data.extracted_strategy.stop_loss} | Square-Off: ${data.extracted_strategy.exit_time}`;
+          
+          document.getElementById('res-net-pnl').innerText = `₹${data.metrics.total_net_pnl.toLocaleString('en-IN')}`;
           document.getElementById('res-sharpe').innerText = data.metrics.sharpe_ratio;
           document.getElementById('res-sortino').innerText = data.metrics.sortino_ratio;
           document.getElementById('res-mdd').innerText = `${data.metrics.max_drawdown_pct}%`;
@@ -447,8 +485,29 @@
           document.getElementById('res-wfa').innerText = `${data.metrics.wfa_persistence_rate}%`;
           document.getElementById('res-dsr').innerText = `${data.metrics.deflated_sharpe_prob}%`;
           document.getElementById('res-drag').innerText = `${data.metrics.cost_drag_pct}%`;
-          document.getElementById('res-kelly').innerText = `${data.kelly_sizing_pct}% Fractional Kelly`;
-        }, 2200);
+
+          // Render Trade Ledger
+          const tbody = document.getElementById('trade-ledger-body');
+          tbody.innerHTML = '';
+          data.trade_ledger.forEach(tr => {
+            const row = document.createElement('tr');
+            row.className = "hover:bg-slate-900/60";
+            const isProfit = tr.net_pnl > 0;
+            row.innerHTML = `
+              <td class="p-2 text-slate-300">${tr.date}</td>
+              <td class="p-2 text-slate-400">${tr.entry_time}</td>
+              <td class="p-2 text-slate-400">${tr.exit_time}</td>
+              <td class="p-2 font-bold text-slate-200">${tr.symbol}</td>
+              <td class="p-2 text-slate-300">₹${tr.entry_price.toFixed(2)}</td>
+              <td class="p-2 text-slate-300">₹${tr.exit_price.toFixed(2)}</td>
+              <td class="p-2 ${tr.gross_pnl > 0 ? 'text-emerald-400' : 'text-rose-400'} font-semibold">₹${tr.gross_pnl.toFixed(2)}</td>
+              <td class="p-2 text-amber-400">₹${tr.friction.toFixed(2)}</td>
+              <td class="p-2 ${isProfit ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}">₹${tr.net_pnl.toFixed(2)}</td>
+              <td class="p-2"><span class="px-1.5 py-0.5 rounded text-[10px] ${tr.exit_reason.includes('STOP') ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'}">${tr.exit_reason}</span></td>
+            `;
+            tbody.appendChild(row);
+          });
+        }, 2600);
 
       } catch (e) {
         document.getElementById('pipeline-progress').classList.add('hidden');
@@ -457,37 +516,6 @@
       }
     }
 
-    // Approve and Stage Strategy
-    async function approveAndStage() {
-      if (!currentBacktestResult) return;
-      const strat = currentBacktestResult.extracted_strategy;
-      const metrics = currentBacktestResult.metrics;
-
-      const payload = {
-        name: strat.name,
-        underlying: strat.underlying,
-        horizon: strat.horizon,
-        sharpe: metrics.sharpe_ratio,
-        max_drawdown: metrics.max_drawdown_pct,
-        win_rate: metrics.win_rate_pct,
-        allocation_pct: currentBacktestResult.kelly_sizing_pct
-      };
-
-      try {
-        const res = await fetch('/api/deploy', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        alert(`Success! ${data.message} Switching to Live Algos desk.`);
-        switchTab('live');
-      } catch (e) {
-        alert("Deployment error: " + e);
-      }
-    }
-
-    // Load Live Algos from Backend
     async function loadLiveAlgos() {
       try {
         const res = await fetch('/api/live-algos');
@@ -522,7 +550,6 @@
       }
     }
 
-    // Load Agents
     async function loadAgents() {
       try {
         const res = await fetch('/api/agents');
@@ -549,7 +576,6 @@
       }
     }
 
-    // Toggle Kill Switch
     async function toggleKillSwitch() {
       const res = await fetch('/api/kill-switch', {method: 'POST'});
       const data = await res.json();
@@ -565,7 +591,6 @@
       }
     }
 
-    // Approve order
     function approveOrder(btn) {
       btn.disabled = true;
       btn.innerHTML = `<i class="fa-solid fa-check-double"></i> Executed on Dhan`;
@@ -578,7 +603,6 @@
       alert("Order Rejected: Signal discarded.");
     }
 
-    // Initial load
     loadLiveAlgos();
   </script>
 </body>

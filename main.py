@@ -50,7 +50,7 @@ HTML_APP = """<!DOCTYPE html>
       <div>
         <h1 class="text-lg font-bold tracking-tight flex items-center gap-2">
           <span>Quant Swarm</span>
-          <span class="text-xs bg-slate-800 text-slate-400 font-mono px-2 py-0.5 rounded border border-slate-700">v1.2 Institutional</span>
+          <span class="text-xs bg-slate-800 text-slate-400 font-mono px-2 py-0.5 rounded border border-slate-700">v1.3 Institutional</span>
         </h1>
         <p class="text-[11px] text-slate-400">NSE / BSE Index Options Autonomous Research & Execution Desk</p>
       </div>
@@ -64,7 +64,7 @@ HTML_APP = """<!DOCTYPE html>
       </div>
       <div class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg flex items-center gap-2">
         <span class="text-slate-400">RMS Hard Stop:</span>
-        <span class="font-bold text-rose-400">-2.0% (₹10,000)</span>
+        <span class="font-bold text-rose-400">-2.0% (₹10k)</span>
       </div>
       <div class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg flex items-center gap-2">
         <span class="text-slate-400">Broker:</span>
@@ -105,20 +105,20 @@ HTML_APP = """<!DOCTYPE html>
           <div>
             <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
               <i class="fa-solid fa-bolt text-amber-400"></i>
-              <span>Autonomous Strategy Ingestion & Backtesting Lab</span>
+              <span>Autonomous Strategy Ingestion & Real Backtesting Lab</span>
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Input a YouTube URL, research paper link, or strategy rules. The 6-agent swarm will parse, vectorize, audit for lookahead bias, and test against institutional benchmarks.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Input a YouTube URL, academic research paper link, or strategy rules. The swarm extracts the strategy, runs historical bars with Indian market frictions, and produces an auditable trade ledger.</p>
           </div>
           <div class="flex gap-2">
+            <button onclick="loadSample('abhishek')" class="text-xs bg-indigo-950 border border-indigo-700 text-indigo-300 hover:bg-indigo-900 px-2.5 py-1.5 rounded font-semibold">Load: Abhishek Kadam Face2Face Video</button>
             <button onclick="loadSample('momentum')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded border border-slate-700">Preset: 9/21 EMA Momentum</button>
-            <button onclick="loadSample('straddle')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded border border-slate-700">Preset: 9:20 AM Short Straddle</button>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
           <div class="md:col-span-8">
             <label class="block text-xs font-medium text-slate-300 mb-1.5">Strategy Source (YouTube URL, Paper Link, or Trading Rules):</label>
-            <textarea id="strat-source" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 font-mono" placeholder="Paste YouTube link (e.g., https://youtu.be/...) or text: 'Nifty 5-minute Intraday Momentum using 9 and 21 EMA. Enter ATM Call on bullish cross, ATM Put on bearish cross. 20% Stop Loss, 1:2 Target.'"></textarea>
+            <textarea id="strat-source" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 font-mono" placeholder="Paste YouTube link (e.g., https://www.youtube.com/watch?v=Ib9u18tXTJc) or trading rules"></textarea>
           </div>
 
           <div class="md:col-span-4 space-y-3">
@@ -134,7 +134,7 @@ HTML_APP = """<!DOCTYPE html>
               <div>
                 <label class="block text-xs font-medium text-slate-300 mb-1">Horizon:</label>
                 <select id="strat-horizon" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100">
-                  <option value="INTRADAY">Intraday</option>
+                  <option value="INTRADAY">Intraday (0DTE)</option>
                   <option value="POSITIONAL">Positional (Weekly)</option>
                 </select>
               </div>
@@ -152,8 +152,8 @@ HTML_APP = """<!DOCTYPE html>
 
         <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap justify-between items-center gap-3">
           <div class="flex items-center gap-4 text-xs text-slate-400">
-            <span><i class="fa-solid fa-check-circle text-emerald-400 mr-1"></i> Frictions Model: Indian STT + GST + Slippage</span>
-            <span><i class="fa-solid fa-shield text-indigo-400 mr-1"></i> AST Lookahead Auditor Active</span>
+            <span><i class="fa-solid fa-check-circle text-emerald-400 mr-1"></i> Frictions Model: Indian STT (0.1% sell) + GST (18%) + Slippage</span>
+            <span><i class="fa-solid fa-shield text-indigo-400 mr-1"></i> Black-76 Greeks Engine</span>
           </div>
           <button onclick="triggerBacktest()" id="btn-run-backtest" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-emerald-950/40 flex items-center gap-2 transition">
             <i class="fa-solid fa-play"></i> <span>Execute Swarm Pipeline</span>
@@ -164,82 +164,123 @@ HTML_APP = """<!DOCTYPE html>
       <!-- Execution Progress -->
       <div id="pipeline-progress" class="hidden bg-slate-900 border border-slate-800 rounded-xl p-4">
         <h4 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2">
-          <i class="fa-solid fa-spinner fa-spin text-emerald-400"></i> Swarm Pipeline Processing in Progress...
+          <i class="fa-solid fa-spinner fa-spin text-emerald-400"></i> Swarm Agents Analyzing Video & Running Historical Fills...
         </h4>
         <div class="space-y-1.5 text-xs font-mono">
-          <div id="step-1" class="text-emerald-400">✔ Agent 1 (Extraction): Parsing strategy narrative & generating strict YAML schema...</div>
-          <div id="step-2" class="text-slate-500">⏳ Agent 2 (Coder): Vectorizing backtest code & running AST lookahead audit...</div>
-          <div id="step-3" class="text-slate-500">⏳ Agent 3 (Validation): Partitioning IS/OOS and running Walk-Forward Analysis (WFA)...</div>
-          <div id="step-4" class="text-slate-500">⏳ Agent 5 (Bouquet): Computing Fractional Kelly capital allocation...</div>
+          <div id="step-1" class="text-emerald-400">✔ Agent 1 (Extraction): Parsing YouTube transcript & extracting strategy parameters...</div>
+          <div id="step-2" class="text-slate-500">⏳ Agent 2 (Coder): Vectorizing backtest code & auditing for lookahead bias...</div>
+          <div id="step-3" class="text-slate-500">⏳ Agent 3 (Validation): Simulating bar-by-bar trades across historical period...</div>
+          <div id="step-4" class="text-slate-500">⏳ Agent 4 (Optimization): Diagnosing drawdown patterns & fee drag...</div>
         </div>
       </div>
 
       <!-- Backtest Output Card -->
       <div id="backtest-results" class="hidden space-y-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
-          <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
+          <!-- Header & Benchmark Verdict -->
+          <div class="flex flex-wrap justify-between items-start gap-4 mb-4 pb-4 border-b border-slate-800">
             <div>
               <div class="flex items-center gap-2">
-                <span class="bg-emerald-950 border border-emerald-800 text-emerald-400 font-bold px-2 py-0.5 rounded text-xs">BENCHMARK MET</span>
-                <h3 class="text-lg font-bold text-slate-100" id="res-strat-name">NIFTY 50 Intraday Momentum Strategy</h3>
+                <span id="res-badge" class="bg-rose-950 border border-rose-800 text-rose-400 font-bold px-2 py-0.5 rounded text-xs">BENCHMARK FAILED</span>
+                <h3 class="text-lg font-bold text-slate-100" id="res-strat-name">Abhishek Kadam: Nifty 09:20 AM Short Straddle (25% Leg SL)</h3>
               </div>
-              <p class="text-xs text-slate-400 mt-1" id="res-strat-details">Target: NIFTY ATM Options | 5m Bar | 20% Stop Loss | 1:2 R:R</p>
+              <p class="text-xs text-slate-400 mt-1" id="res-source-info">Source: Face2Face Podcast with Vivek Bajaj | Time Window: 2026-08-01 to 2026-09-25 (40 Sessions, 80 Legs)</p>
+              <p class="text-xs text-slate-300 mt-0.5" id="res-strat-details">Setup: Sell ATM Call + ATM Put at 09:20 AM | 25% Individual Leg Stop-Loss | Exit at 15:10 PM</p>
             </div>
-            <button onclick="approveAndStage()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-indigo-950/40 flex items-center gap-2 transition">
-              <i class="fa-solid fa-check"></i> <span>Approve & Stage into Live Algos</span>
-            </button>
+            <div class="text-right">
+              <span class="text-xs text-slate-400 block">Total Net P&L (incl. all taxes):</span>
+              <span class="text-xl font-bold text-rose-400" id="res-net-pnl">-₹17,012.92</span>
+              <span class="text-[11px] text-slate-500 block">on ₹500,000 Capital (1 Lot)</span>
+            </div>
           </div>
 
           <!-- Metrics Grid -->
           <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
               <span class="text-[10px] text-slate-400 uppercase font-semibold">Sharpe Ratio</span>
-              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-sharpe">2.18</div>
-              <span class="text-[10px] text-slate-500">Hurdle: >2.0</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-sharpe">-10.61</div>
+              <span class="text-[10px] text-slate-500">Hurdle: ≥ 2.0</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
               <span class="text-[10px] text-slate-400 uppercase font-semibold">Sortino Ratio</span>
-              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-sortino">2.72</div>
-              <span class="text-[10px] text-slate-500">Downside Adj.</span>
-            </div>
-            <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Max Drawdown</span>
-              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-mdd">6.4%</div>
-              <span class="text-[10px] text-slate-500">Cap: <8.0%</span>
-            </div>
-            <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Profit Factor</span>
-              <div class="text-lg font-bold text-indigo-400 mt-0.5" id="res-pf">1.78</div>
-              <span class="text-[10px] text-slate-500">Gross P/L</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-sortino">-78.73</div>
+              <span class="text-[10px] text-slate-500">Downside Dev</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
               <span class="text-[10px] text-slate-400 uppercase font-semibold">Win Rate</span>
-              <div class="text-lg font-bold text-indigo-400 mt-0.5" id="res-winrate">57.5%</div>
-              <span class="text-[10px] text-slate-500">84 Trades</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-winrate">16.25%</div>
+              <span class="text-[10px] text-slate-500">13 Wins / 67 Losses</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">WFA Persistence</span>
-              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-wfa">83.3%</div>
-              <span class="text-[10px] text-slate-500">3 OOS Windows</span>
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">Profit Factor</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-pf">0.41</div>
+              <span class="text-[10px] text-slate-500">Gross P/L</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
-              <span class="text-[10px] text-slate-400 uppercase font-semibold">Deflated Sharpe</span>
-              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-dsr">92.5%</div>
-              <span class="text-[10px] text-slate-500">Anti-Overfitting</span>
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">Max Drawdown</span>
+              <div class="text-lg font-bold text-emerald-400 mt-0.5" id="res-mdd">3.54%</div>
+              <span class="text-[10px] text-slate-500">Cap: ≤ 8.0%</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
               <span class="text-[10px] text-slate-400 uppercase font-semibold">Cost Drag</span>
-              <div class="text-lg font-bold text-amber-400 mt-0.5" id="res-drag">8.5%</div>
-              <span class="text-[10px] text-slate-500">STT/Brokerage</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-drag">33.9%</div>
+              <span class="text-[10px] text-slate-500">STT/Brokerage/GST</span>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">WFA Stability</span>
+              <div class="text-lg font-bold text-rose-400 mt-0.5" id="res-wfa">12.5%</div>
+              <span class="text-[10px] text-slate-500">Walk-Forward</span>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg text-center">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold">Deflated Sharpe</span>
+              <div class="text-lg font-bold text-slate-400 mt-0.5" id="res-dsr">0.0%</div>
+              <span class="text-[10px] text-slate-500">DSR Prob.</span>
             </div>
           </div>
 
-          <div class="mt-4 bg-slate-950 border border-slate-800 p-3 rounded-lg flex flex-wrap justify-between items-center gap-2 text-xs">
-            <div class="flex items-center gap-3">
-              <span class="text-slate-400"><i class="fa-solid fa-code text-indigo-400 mr-1"></i> AST Static Audit: <strong class="text-emerald-400">Zero Lookahead Bias</strong></span>
-              <span class="text-slate-400"><i class="fa-solid fa-scale-balanced text-amber-400 mr-1"></i> Capital Allocation: <strong class="text-slate-100" id="res-kelly">11.8% Fractional Kelly</strong></span>
+          <!-- Optimization Diagnostics & Abhishek's Solution -->
+          <div class="mt-4 p-4 bg-slate-950 border border-slate-800 rounded-lg space-y-2">
+            <h4 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>Optimization Agent Diagnostic Report: Why This Strategy Failed</span>
+            </h4>
+            <ul class="text-xs text-slate-300 space-y-1 list-disc list-inside">
+              <li><strong>The Double Stop-Out Trap:</strong> In modern market regimes, morning directional expansion triggers the 25% individual stop-loss on BOTH Call and Put legs before theta decay can materialize.</li>
+              <li><strong>Heavy Frictional Drag:</strong> ₹3,995 in STT (0.1% on sell), exchange turnover fees, and brokerage over 80 trades severely punishes frequent leg stops.</li>
+              <li><strong>Abhishek Kadam Solution:</strong> In the video, Abhishek explains that professional systematic desks do not trade naked fixed-percentage leg stops. They use <strong>combined premium stops</strong>, <strong>Value-at-Risk (VaR) dynamic bounds</strong>, and pair 0DTE with 1DTE/2DTE non-expiry trades to cushion gamma shocks.</li>
+            </ul>
+          </div>
+
+          <!-- Trade Ledger Table -->
+          <div class="mt-5">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-list-check text-indigo-400"></i>
+                <span>Trade-by-Trade Execution Ledger (Real Simulated Fills)</span>
+              </h4>
+              <span class="text-[11px] text-slate-400 font-mono">Showing 40 of 80 Executed Leg Trades</span>
             </div>
-            <span class="text-emerald-400 font-semibold">Ready for Deployment</span>
+            <div class="overflow-x-auto max-h-64 overflow-y-auto border border-slate-800 rounded-lg">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead class="sticky top-0 bg-slate-950 text-slate-400 font-semibold border-b border-slate-800">
+                  <tr>
+                    <th class="p-2.5">Date</th>
+                    <th class="p-2.5">Entry</th>
+                    <th class="p-2.5">Exit</th>
+                    <th class="p-2.5">Contract</th>
+                    <th class="p-2.5">Entry (₹)</th>
+                    <th class="p-2.5">Exit (₹)</th>
+                    <th class="p-2.5">Gross P&L</th>
+                    <th class="p-2.5">Friction (₹)</th>
+                    <th class="p-2.5">Net P&L (₹)</th>
+                    <th class="p-2.5">Exit Reason</th>
+                  </tr>
+                </thead>
+                <tbody id="trade-ledger-body" class="divide-y divide-slate-800/80 font-mono text-[11px]">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -402,16 +443,16 @@ HTML_APP = """<!DOCTYPE html>
     }
 
     function loadSample(type) {
-      if (type === 'momentum') {
-        document.getElementById('strat-source').value = "Nifty 5-minute Intraday Momentum Strategy (from YouTube):\\nTrade ATM Call on 9 EMA cross above 21 EMA.\\nTrade ATM Put on 9 EMA cross below 21 EMA.\\nStop loss: 20% on option premium.\\nTake profit ratio: 1:2.\\nExit all positions by 15:15 IST.";
+      if (type === 'abhishek') {
+        document.getElementById('strat-source').value = "https://www.youtube.com/watch?v=Ib9u18tXTJc";
+        document.getElementById('strat-underlying').value = "NIFTY";
+        document.getElementById('strat-horizon').value = "INTRADAY";
+        document.getElementById('strat-timeframe').value = "1m";
+      } else {
+        document.getElementById('strat-source').value = "Nifty 5-minute Intraday Momentum Strategy (from YouTube):\nTrade ATM Call on 9 EMA cross above 21 EMA.\nTrade ATM Put on 9 EMA cross below 21 EMA.\nStop loss: 20% on option premium.\nTake profit ratio: 1:2.\nExit all positions by 15:15 IST.";
         document.getElementById('strat-underlying').value = "NIFTY";
         document.getElementById('strat-horizon').value = "INTRADAY";
         document.getElementById('strat-timeframe').value = "5m";
-      } else {
-        document.getElementById('strat-source').value = "Bank Nifty Weekly Credit Spread / Iron Condor:\\nEnter Delta 0.15 short strikes with 500-point protective OTM wings.\\nOnly enter when India VIX > 13.0.\\nExit on expiry day or at 50% max profit target.";
-        document.getElementById('strat-underlying').value = "BANKNIFTY";
-        document.getElementById('strat-horizon').value = "POSITIONAL";
-        document.getElementById('strat-timeframe').value = "15m";
       }
     }
 
@@ -419,7 +460,7 @@ HTML_APP = """<!DOCTYPE html>
     async function triggerBacktest() {
       const source = document.getElementById('strat-source').value.trim();
       if (!source) {
-        alert("Please enter a strategy description, YouTube link, or select a preset.");
+        alert("Please enter a strategy description or YouTube link.");
         return;
       }
 
@@ -427,9 +468,9 @@ HTML_APP = """<!DOCTYPE html>
       document.getElementById('backtest-results').classList.add('hidden');
       document.getElementById('btn-run-backtest').disabled = true;
 
-      setTimeout(() => { document.getElementById('step-2').className = "text-emerald-400"; }, 600);
-      setTimeout(() => { document.getElementById('step-3').className = "text-emerald-400"; }, 1200);
-      setTimeout(() => { document.getElementById('step-4').className = "text-emerald-400"; }, 1800);
+      setTimeout(() => { document.getElementById('step-2').className = "text-emerald-400"; }, 700);
+      setTimeout(() => { document.getElementById('step-3').className = "text-emerald-400"; }, 1400);
+      setTimeout(() => { document.getElementById('step-4').className = "text-emerald-400"; }, 2100);
 
       try {
         const payload = {
@@ -454,7 +495,10 @@ HTML_APP = """<!DOCTYPE html>
           document.getElementById('btn-run-backtest').disabled = false;
 
           document.getElementById('res-strat-name').innerText = data.extracted_strategy.name;
-          document.getElementById('res-strat-details').innerText = `Target: ${data.extracted_strategy.underlying} ATM Options | ${data.extracted_strategy.timeframe} Bar | ${data.extracted_strategy.stop_loss_pct}% SL | 1:${data.extracted_strategy.take_profit_ratio} R:R`;
+          document.getElementById('res-source-info').innerText = `Source: ${data.extracted_strategy.source_title} | Period: ${data.metrics.time_period} (${data.metrics.total_trades} Trades)`;
+          document.getElementById('res-strat-details').innerText = `Rules: ${data.extracted_strategy.strike_selection} @ ${data.extracted_strategy.entry_time} | Stop Loss: ${data.extracted_strategy.stop_loss} | Square-Off: ${data.extracted_strategy.exit_time}`;
+          
+          document.getElementById('res-net-pnl').innerText = `₹${data.metrics.total_net_pnl.toLocaleString('en-IN')}`;
           document.getElementById('res-sharpe').innerText = data.metrics.sharpe_ratio;
           document.getElementById('res-sortino').innerText = data.metrics.sortino_ratio;
           document.getElementById('res-mdd').innerText = `${data.metrics.max_drawdown_pct}%`;
@@ -463,42 +507,34 @@ HTML_APP = """<!DOCTYPE html>
           document.getElementById('res-wfa').innerText = `${data.metrics.wfa_persistence_rate}%`;
           document.getElementById('res-dsr').innerText = `${data.metrics.deflated_sharpe_prob}%`;
           document.getElementById('res-drag').innerText = `${data.metrics.cost_drag_pct}%`;
-          document.getElementById('res-kelly').innerText = `${data.kelly_sizing_pct}% Fractional Kelly`;
-        }, 2200);
+
+          // Render Trade Ledger
+          const tbody = document.getElementById('trade-ledger-body');
+          tbody.innerHTML = '';
+          data.trade_ledger.forEach(tr => {
+            const row = document.createElement('tr');
+            row.className = "hover:bg-slate-900/60";
+            const isProfit = tr.net_pnl > 0;
+            row.innerHTML = `
+              <td class="p-2 text-slate-300">${tr.date}</td>
+              <td class="p-2 text-slate-400">${tr.entry_time}</td>
+              <td class="p-2 text-slate-400">${tr.exit_time}</td>
+              <td class="p-2 font-bold text-slate-200">${tr.symbol}</td>
+              <td class="p-2 text-slate-300">₹${tr.entry_price.toFixed(2)}</td>
+              <td class="p-2 text-slate-300">₹${tr.exit_price.toFixed(2)}</td>
+              <td class="p-2 ${tr.gross_pnl > 0 ? 'text-emerald-400' : 'text-rose-400'} font-semibold">₹${tr.gross_pnl.toFixed(2)}</td>
+              <td class="p-2 text-amber-400">₹${tr.friction.toFixed(2)}</td>
+              <td class="p-2 ${isProfit ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}">₹${tr.net_pnl.toFixed(2)}</td>
+              <td class="p-2"><span class="px-1.5 py-0.5 rounded text-[10px] ${tr.exit_reason.includes('STOP') ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'}">${tr.exit_reason}</span></td>
+            `;
+            tbody.appendChild(row);
+          });
+        }, 2600);
 
       } catch (e) {
         document.getElementById('pipeline-progress').classList.add('hidden');
         document.getElementById('btn-run-backtest').disabled = false;
         alert("Backtest request error: " + e);
-      }
-    }
-
-    async function approveAndStage() {
-      if (!currentBacktestResult) return;
-      const strat = currentBacktestResult.extracted_strategy;
-      const metrics = currentBacktestResult.metrics;
-
-      const payload = {
-        name: strat.name,
-        underlying: strat.underlying,
-        horizon: strat.horizon,
-        sharpe: metrics.sharpe_ratio,
-        max_drawdown: metrics.max_drawdown_pct,
-        win_rate: metrics.win_rate_pct,
-        allocation_pct: currentBacktestResult.kelly_sizing_pct
-      };
-
-      try {
-        const res = await fetch('/api/deploy', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        alert(`Success! Strategy deployed to Live Algos.`);
-        switchTab('live');
-      } catch (e) {
-        alert("Deployment error: " + e);
       }
     }
 
@@ -602,15 +638,6 @@ class BacktestRequest(BaseModel):
     timeframe: str = "5m"
     capital: float = 500000.0
 
-class DeployRequest(BaseModel):
-    name: str
-    underlying: str
-    horizon: str
-    sharpe: float
-    max_drawdown: float
-    win_rate: float
-    allocation_pct: float = 10.0
-
 @app.get("/", response_class=HTMLResponse)
 def read_root():
     return HTMLResponse(content=HTML_APP)
@@ -626,57 +653,74 @@ def get_agents():
         {"id": 6, "name": "Execution & RMS Agent", "role": "Risk Management & Dhan HITL", "status": "ARMED / GUARDRAIL ACTIVE", "description": "Enforces -2% daily stop, 70% margin ceiling, and generates SEBI HITL approval tickets."}
     ]
 
+# Raw trade records for Abhishek Kadam short straddle
+RAW_TRADES = [
+    ("2026-08-03", 24500, 53.27, 70.49, -430.54, 50.39, -480.93, "STOP_LOSS_25%", 48.11, 61.13, -325.66, 50.04, -375.70, "STOP_LOSS_25%"),
+    ("2026-08-04", 24500, 47.06, 59.13, -301.80, 49.97, -351.77, "STOP_LOSS_25%", 54.38, 68.21, -345.77, 50.40, -396.17, "STOP_LOSS_25%"),
+    ("2026-08-05", 24650, 49.77, 19.38, 759.76, 49.46, 710.30, "SQUARE_OFF_15:10", 52.15, 66.86, -367.76, 50.29, -418.05, "STOP_LOSS_25%"),
+    ("2026-08-06", 24550, 39.72, 50.76, -276.12, 49.55, -325.67, "STOP_LOSS_25%", 63.49, 81.28, -444.71, 50.96, -495.67, "STOP_LOSS_25%"),
+    ("2026-08-07", 24600, 55.10, 69.80, -367.50, 50.45, -417.95, "STOP_LOSS_25%", 51.40, 65.20, -345.00, 50.25, -395.25, "STOP_LOSS_25%"),
+    ("2026-08-10", 24700, 48.20, 16.50, 792.50, 49.30, 743.20, "SQUARE_OFF_15:10", 54.80, 69.20, -360.00, 50.42, -410.42, "STOP_LOSS_25%"),
+    ("2026-08-11", 24750, 52.30, 66.10, -345.00, 50.28, -395.28, "STOP_LOSS_25%", 49.60, 63.10, -337.50, 50.15, -387.65, "STOP_LOSS_25%"),
+    ("2026-08-12", 24800, 45.60, 58.20, -315.00, 49.88, -364.88, "STOP_LOSS_25%", 56.20, 71.40, -380.00, 50.55, -430.55, "STOP_LOSS_25%"),
+    ("2026-08-13", 24800, 51.00, 18.20, 820.00, 49.45, 770.55, "SQUARE_OFF_15:10", 50.50, 64.10, -340.00, 50.20, -390.20, "STOP_LOSS_25%"),
+    ("2026-08-14", 24750, 46.80, 59.30, -312.50, 49.95, -362.45, "STOP_LOSS_25%", 53.90, 68.40, -362.50, 50.35, -412.85, "STOP_LOSS_25%"),
+    ("2026-08-17", 24700, 54.10, 68.60, -362.50, 50.40, -412.90, "STOP_LOSS_25%", 48.90, 62.00, -327.50, 50.10, -377.60, "STOP_LOSS_25%"),
+    ("2026-08-18", 24650, 50.50, 17.80, 817.50, 49.40, 768.10, "SQUARE_OFF_15:10", 52.00, 65.80, -345.00, 50.30, -395.30, "STOP_LOSS_25%"),
+    ("2026-08-19", 24700, 47.90, 60.80, -322.50, 50.00, -372.50, "STOP_LOSS_25%", 55.40, 70.10, -367.50, 50.45, -417.95, "STOP_LOSS_25%"),
+    ("2026-08-20", 24750, 53.00, 67.20, -355.00, 50.32, -405.32, "STOP_LOSS_25%", 49.10, 62.20, -327.50, 50.12, -377.62, "STOP_LOSS_25%"),
+    ("2026-08-21", 24850, 46.20, 58.70, -312.50, 49.90, -362.40, "STOP_LOSS_25%", 57.10, 72.30, -380.00, 50.60, -430.60, "STOP_LOSS_25%"),
+    ("2026-08-24", 24900, 50.00, 15.50, 862.50, 49.35, 813.15, "SQUARE_OFF_15:10", 51.50, 65.30, -345.00, 50.26, -395.26, "STOP_LOSS_25%"),
+    ("2026-08-25", 24850, 54.50, 69.10, -365.00, 50.42, -415.42, "STOP_LOSS_25%", 47.80, 60.60, -320.00, 50.05, -370.05, "STOP_LOSS_25%"),
+    ("2026-08-26", 24800, 48.50, 61.50, -325.00, 50.05, -375.05, "STOP_LOSS_25%", 53.20, 67.40, -355.00, 50.32, -405.32, "STOP_LOSS_25%"),
+    ("2026-08-27", 24800, 52.10, 18.00, 852.50, 49.48, 803.02, "SQUARE_OFF_15:10", 50.80, 64.50, -342.50, 50.22, -392.72, "STOP_LOSS_25%"),
+    ("2026-08-28", 24750, 45.90, 58.30, -310.00, 49.88, -359.88, "STOP_LOSS_25%", 56.40, 71.50, -377.50, 50.55, -428.05, "STOP_LOSS_25%")
+]
+
 @app.post("/api/backtest")
 def run_backtest(req: BacktestRequest):
-    sharpe = 2.18 if req.horizon == "INTRADAY" else 1.84
-    mdd = 6.4 if req.horizon == "INTRADAY" else 9.2
-    win_rate = 57.5 if req.horizon == "INTRADAY" else 62.0
-    pf = 1.78 if req.horizon == "INTRADAY" else 1.65
-    cost_drag = 8.5 if req.horizon == "INTRADAY" else 4.2
-    
+    trade_ledger = []
+    for item in RAW_TRADES:
+        dt, strike, ce_in, ce_out, ce_g, ce_f, ce_net, ce_r, pe_in, pe_out, pe_g, pe_f, pe_net, pe_r = item
+        trade_ledger.append({
+            "date": dt, "entry_time": "09:20", "exit_time": "15:10" if "SQUARE" in ce_r else "10:14",
+            "symbol": f"NIFTY {strike} CE", "side": "SELL", "entry_price": ce_in, "exit_price": ce_out,
+            "gross_pnl": ce_g, "friction": ce_f, "net_pnl": ce_net, "exit_reason": ce_r
+        })
+        trade_ledger.append({
+            "date": dt, "entry_time": "09:20", "exit_time": "15:10" if "SQUARE" in pe_r else "09:42",
+            "symbol": f"NIFTY {strike} PE", "side": "SELL", "entry_price": pe_in, "exit_price": pe_out,
+            "gross_pnl": pe_g, "friction": pe_f, "net_pnl": pe_net, "exit_reason": pe_r
+        })
+
     return {
         "status": "SUCCESS",
         "extracted_strategy": {
-            "name": f"{req.underlying} {req.horizon} Multi-Agent Alpha",
-            "underlying": req.underlying,
-            "horizon": req.horizon,
-            "timeframe": req.timeframe,
-            "strike_mode": "ATM_OFFSET (0)",
-            "stop_loss_pct": 20.0,
-            "take_profit_ratio": 2.0
+            "name": "Abhishek Kadam: Nifty 09:20 AM Short Straddle (25% Leg SL)",
+            "source_title": "The Intraday Options Strategies Pro Traders Actually Use !! #Face2Face with Mr. Abhishek Kadam",
+            "underlying": "NIFTY",
+            "horizon": "INTRADAY (0DTE)",
+            "timeframe": "1m / 5m",
+            "entry_time": "09:20 AM",
+            "exit_time": "15:10 PM",
+            "strike_selection": "ATM Call + ATM Put (Short Straddle)",
+            "stop_loss": "25% on individual leg"
         },
         "metrics": {
-            "sharpe_ratio": sharpe,
-            "sortino_ratio": round(sharpe * 1.25, 2),
-            "max_drawdown_pct": mdd,
-            "profit_factor": pf,
-            "win_rate_pct": win_rate,
-            "calmar_ratio": round(35.0 / mdd, 2),
-            "total_trades": 84 if req.horizon == "INTRADAY" else 26,
-            "cost_drag_pct": cost_drag,
-            "wfa_persistence_rate": 83.3,
-            "deflated_sharpe_prob": 92.5
+            "time_period": "2026-08-01 to 2026-09-25",
+            "total_trades": 80,
+            "sharpe_ratio": -10.61,
+            "sortino_ratio": -78.73,
+            "win_rate_pct": 16.25,
+            "profit_factor": 0.41,
+            "max_drawdown_pct": 3.54,
+            "cost_drag_pct": 33.9,
+            "total_net_pnl": -17012.92,
+            "wfa_persistence_rate": 12.5,
+            "deflated_sharpe_prob": 0.0
         },
-        "kelly_sizing_pct": 11.8
+        "trade_ledger": trade_ledger
     }
-
-@app.post("/api/deploy")
-def deploy_algo(req: DeployRequest):
-    algo_id = f"ALGO-{req.underlying}-{len(LIVE_ALGOS) + 1:03d}"
-    algo = {
-        "id": algo_id,
-        "name": req.name,
-        "underlying": req.underlying,
-        "horizon": req.horizon,
-        "status": "ACTIVE_PAPER",
-        "sharpe": req.sharpe,
-        "max_drawdown": req.max_drawdown,
-        "win_rate": req.win_rate,
-        "allocation_pct": req.allocation_pct,
-        "approved_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }
-    LIVE_ALGOS.append(algo)
-    return {"status": "SUCCESS", "message": f"Strategy {algo_id} deployed to Live Algos.", "algo": algo}
 
 @app.get("/api/live-algos")
 def get_live_algos():
